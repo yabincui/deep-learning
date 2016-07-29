@@ -7,8 +7,10 @@ A library to load the MNIST image data.
 
 import cPickle
 import gzip
+import os
 
 import numpy as np
+
 
 def load_data():
     """Return the MNIST data as a tuple containing the training data,
@@ -29,7 +31,8 @@ def load_data():
     each contains only 10000 images.
     """
 
-    f = gzip.open('./mnist.pkl.gz', 'rb')
+    dirname = os.path.dirname(os.path.realpath(__file__))
+    f = gzip.open(dirname + '/mnist.pkl.gz', 'rb')
     training_data, validation_data, test_data = cPickle.load(f)
     f.close()
     return (training_data, validation_data, test_data)

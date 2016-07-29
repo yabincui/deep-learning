@@ -19,13 +19,15 @@ class Network(object):
         self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
         self.weights = [np.random.randn(y, x)
                         for x, y in zip(sizes[:-1], sizes[1:])]
+        self.weight_num = sum([x * y for x, y in zip(sizes[:-1], sizes[1:])])
 
     def feedforward(self, a):
         for b, w in zip(self.biases, self.weights):
             a = sigmoid(np.dot(w, a) + b)
         return a
 
-    def SGD(self, training_data, epochs, mini_batch_size, eta, test_data = None):
+    def SGD(self, training_data, epochs, mini_batch_size, eta, test_data = None,
+            lmbda=0.0):
         """Train the neural network using mini-batch stochastic
         gradient descent. The "training_data" is a list of tuples
         "(x, y)" representing the training inputs and the desired
@@ -43,15 +45,15 @@ class Network(object):
                     training_data[k:k+mini_batch_size]
                     for k in xrange(0, n, mini_batch_size)]
             for mini_batch in mini_batches:
-                self.update_mini_batch(mini_batch, eta)
+                self.update_mini_batch(mini_batch, eta, lmbda)
             if test_data:
-                print "Epoch {0}: cost {1}, {2} / {3}".format(
+                print "Epoch {0}: cost {1}  {2} / {3}".format(
                         j, self.evaluate_cost(training_data),
                         self.evaluate(test_data), n_test)
             else:
                 print "Epoch {0} complete".format(j)
 
-    def update_mini_batch(self, mini_batch, eta):
+    def update_mini_batch(self, mini_batch, eta, lmbda):
         """Update the network's weights and biases by applying
         gradient descent using backpropagation to a single
         mini batch. The "mini_batch" is a list of tuples
@@ -59,7 +61,8 @@ class Network(object):
         x = np.asarray([_x.ravel() for _x, _y in mini_batch]).transpose()
         y = np.asarray([_y.ravel() for _x, _y in mini_batch]).transpose()
         nabla_b, nabla_w = self.backprop(x, y)
-        self.weights = [w-(eta/len(mini_batch))*nw
+        weight_decay = 1 - lmbda / self.weight_num
+        self.weights = [weight_decay * w-(eta/len(mini_batch))*nw
                         for w, nw in zip(self.weights, nabla_w)]
         self.biases = [b-(eta/len(mini_batch))*nb
                         for b, nb in zip(self.biases, nabla_b)]

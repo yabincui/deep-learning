@@ -60,8 +60,8 @@ class Network(object):
         x = np.asarray([_x.ravel() for _x, _y in mini_batch]).transpose()
         y = np.asarray([_y.ravel() for _x, _y in mini_batch]).transpose()
         nabla_b, nabla_w = self.backprop(x, y)
-        weight_decay = 1 - eta * lmbda / n
-        self.weights = [weight_decay * w-(eta/len(mini_batch))*nw
+        regularization_value = eta * lmbda / n
+        self.weights = [w - regularization_value * np.sign(w) -(eta/len(mini_batch))*nw \
                         for w, nw in zip(self.weights, nabla_w)]
         self.biases = [b-(eta/len(mini_batch))*nb
                         for b, nb in zip(self.biases, nabla_b)]

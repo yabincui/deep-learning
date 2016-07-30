@@ -17,7 +17,7 @@ class Network(object):
         self.sizes = sizes
         # randomize the biases and weights.
         self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
-        self.weights = [np.random.randn(y, x)
+        self.weights = [np.random.randn(y, x) / np.sqrt(x)
                         for x, y in zip(sizes[:-1], sizes[1:])]
 
     def feedforward(self, a):
